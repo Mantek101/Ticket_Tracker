@@ -1,1 +1,199 @@
 @import "tailwindcss";
+
+@theme {
+  --font-display: "Anton", "Arial Narrow", sans-serif;
+  --font-body: "Overpass", "Segoe UI", sans-serif;
+  --font-mono: "Space Mono", "Courier New", monospace;
+
+  --color-ink: #0e1317;
+  --color-panel: #141b21;
+  --color-raised: #1a232b;
+  --color-hover: #202b35;
+  --color-edge: #2b3742;
+  --color-edge2: #3d4c59;
+  --color-fog: #8b9ba7;
+  --color-dim: #5f707c;
+  --color-snow: #edf3f1;
+  --color-go: #1fb26b;
+  --color-godeep: #0a3d2a;
+  --color-warn: #ffb020;
+  --color-warndeep: #4d3202;
+  --color-danger: #f2555a;
+  --color-dangerdeep: #471316;
+  --color-signgreen: #0f6b45;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-snow);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(255, 176, 32, 0.35);
+}
+
+/* ---------- ambient scene ---------- */
+.bg-scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(900px 480px at 88% -8%, rgba(31, 178, 107, 0.09), transparent 62%),
+    radial-gradient(760px 420px at 4% -6%, rgba(255, 176, 32, 0.07), transparent 58%),
+    radial-gradient(1200px 800px at 50% 118%, rgba(15, 107, 69, 0.12), transparent 60%),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.014) 0 2px, transparent 2px 7px);
+}
+
+/* ---------- animated road line ---------- */
+.road-line {
+  background-image: repeating-linear-gradient(
+    90deg,
+    #ffb020 0 44px,
+    transparent 44px 74px
+  );
+  animation: lane-dash 1.2s linear infinite;
+}
+@keyframes lane-dash {
+  to {
+    background-position: -74px 0;
+  }
+}
+
+.hazard {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(242, 85, 90, 0.9) 0 10px,
+    rgba(14, 19, 23, 0.95) 10px 20px
+  );
+}
+
+/* ---------- reveals & motion ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.9) rotate(-20deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-11deg);
+  }
+  100% {
+    opacity: 0.95;
+    transform: scale(1) rotate(-12deg);
+  }
+}
+.stamp-in {
+  animation: stamp-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.toast-in {
+  animation: toast-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.modal-in {
+  animation: modal-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(242, 85, 90, 0.5);
+  }
+  60% {
+    box-shadow: 0 0 0 7px rgba(242, 85, 90, 0);
+  }
+}
+.pulse-dot {
+  animation: pulse-dot 1.6s ease-out infinite;
+}
+
+@keyframes blink-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+.blink-soft {
+  animation: blink-soft 1.7s ease-in-out infinite;
+}
+
+.needle {
+  transition: transform 1s cubic-bezier(0.34, 1.3, 0.5, 1);
+}
+
+/* ---------- ticket perforation notches ---------- */
+.notch-top,
+.notch-bottom {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--color-ink);
+  border: 1px solid var(--color-edge);
+  z-index: 2;
+}
+
+/* ---------- scrollbars ---------- */
+.nice-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.nice-scroll::-webkit-scrollbar-thumb {
+  background: #2b3742;
+  border-radius: 8px;
+  border: 3px solid var(--color-panel);
+}
+.nice-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
