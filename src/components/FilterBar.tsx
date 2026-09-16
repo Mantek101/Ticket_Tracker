@@ -42,19 +42,19 @@ export default function FilterBar({
         <IconSearch
           width={15}
           height={15}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dim"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
         />
         <input
           value={query}
           onChange={(e) => onQuery(e.target.value)}
-          placeholder="Search violation, #, court…"
-          className="w-[240px] rounded-md border border-edge bg-panel py-2 pl-9 pr-8 text-sm text-snow placeholder:text-dim transition-colors focus:border-warn/70 focus:outline-none"
+          placeholder="Search tickets..."
+          className="w-[240px] rounded-lg border border-border bg-surface py-2 pl-9 pr-8 text-sm text-text placeholder:text-dim transition-colors focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue/20"
         />
         {query && (
           <button
             onClick={() => onQuery("")}
             aria-label="Clear search"
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-dim transition-colors hover:text-snow"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted transition-colors hover:text-text"
           >
             <IconX width={13} height={13} />
           </button>
@@ -68,14 +68,14 @@ export default function FilterBar({
             <button
               key={c.key}
               onClick={() => onStatus(c.key)}
-              className={`rounded-full border px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wider transition-all active:translate-y-px ${
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:translate-y-px ${
                 active
-                  ? "border-snow bg-snow text-ink"
-                  : "border-edge text-fog hover:border-edge2 hover:text-snow"
-              } ${c.key === "overdue" && !active && counts.overdue > 0 ? "border-danger/50 text-danger" : ""}`}
+                  ? "bg-navy text-white"
+                  : "border border-border text-muted hover:border-border2 hover:text-text"
+              } ${c.key === "overdue" && !active && counts.overdue > 0 ? "border-red-border text-red" : ""}`}
             >
               {c.label}
-              <span className={active ? "ml-1.5 text-ink/60" : "ml-1.5 text-dim"}>
+              <span className={`ml-1.5 ${active ? "text-white/60" : "text-dim"}`}>
                 {counts[c.key]}
               </span>
             </button>
@@ -84,13 +84,11 @@ export default function FilterBar({
       </div>
 
       <label className="ml-auto flex items-center gap-2">
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-dim">
-          Sort
-        </span>
+        <span className="text-xs font-medium text-muted">Sort by</span>
         <select
           value={sort}
           onChange={(e) => onSort(e.target.value as SortKey)}
-          className="rounded-md border border-edge bg-panel px-2.5 py-2 font-mono text-xs text-snow transition-colors focus:border-warn/70 focus:outline-none"
+          className="rounded-lg border border-border bg-surface px-2.5 py-2 text-xs font-medium text-text transition-colors focus:border-blue focus:outline-none focus:ring-2 focus:ring-blue/20"
         >
           <option value="due">Due date ↑</option>
           <option value="fine">Fine ↓</option>

@@ -85,19 +85,6 @@ function load(): Ticket[] {
   return seedTickets();
 }
 
-function RegSign() {
-  return (
-    <svg viewBox="0 0 120 120" className="h-28 w-28" aria-hidden="true">
-      <circle cx="60" cy="60" r="52" fill="var(--color-panel)" stroke="var(--color-danger)" strokeWidth="9" />
-      <g transform="translate(36,38) scale(2)" stroke="var(--color-fog)" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a3 3 0 0 0 0 6v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a3 3 0 0 0 0-6z" />
-        <path d="M14.5 5.5v13" strokeDasharray="2 3" />
-      </g>
-      <line x1="24" y1="96" x2="96" y2="24" stroke="var(--color-danger)" strokeWidth="9" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 export default function App() {
   const [tickets, dispatch] = useReducer(reducer, undefined, load);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -109,7 +96,6 @@ export default function App() {
   const [sort, setSort] = useState<SortKey>("due");
   const quotaWarned = useRef(false);
 
-  /* ---------- toasts ---------- */
   const notify = useCallback((kind: ToastKind, title: string, body?: string) => {
     const id = uid();
     setToasts((prev) => [...prev.slice(-3), { id, kind, title, body }]);
@@ -119,7 +105,6 @@ export default function App() {
     );
   }, []);
 
-  /* ---------- persistence ---------- */
   useEffect(() => {
     try {
       localStorage.setItem(KEY, JSON.stringify(tickets));
@@ -128,14 +113,13 @@ export default function App() {
         quotaWarned.current = true;
         notify(
           "error",
-          "Browser storage is full",
-          "Large attachments may not persist. Remove old evidence to free space.",
+          "Storage full",
+          "Remove old attachments to free space.",
         );
       }
     }
   }, [tickets, notify]);
 
-  /* ---------- scroll lock while overlays open ---------- */
   const detailTicket = useMemo(
     () => tickets.find((t) => t.id === detailId) ?? null,
     [tickets, detailId],
@@ -152,7 +136,6 @@ export default function App() {
     if (detailId && !detailTicket) setDetailId(null);
   }, [detailId, detailTicket]);
 
-  /* ---------- derived ---------- */
   const counts: Counts = useMemo(() => {
     const c: Counts = { all: tickets.length, open: 0, soon: 0, overdue: 0, closed: 0 };
     tickets.forEach((t) => {
@@ -192,37 +175,32 @@ export default function App() {
     return list;
   }, [tickets, status, query, sort]);
 
-  /* ---------- actions ---------- */
   const handleAdd = (t: Ticket) => {
     dispatch({ type: "add", ticket: t });
     setFormOpen(false);
-    notify("success", "Citation logged", `#${t.citationNo} is on the board — deadline armed.`);
+    notify("success", "Ticket saved", `#${t.citationNo} added.`);
   };
 
   const requestDelete = (t: Ticket) =>
     setConfirm({
-      title: "Scrap this citation?",
-      message: `"${t.violation}" (#${t.citationNo}) plus its notes and evidence will be gone for good.`,
-      confirmLabel: "Delete it",
+      title: "Delete this ticket?",
+      message: `"${t.violation}" (#${t.citationNo}) and all its notes and attachments will be permanently deleted.`,
+      confirmLabel: "Delete",
       danger: true,
       onConfirm: () => {
         dispatch({ type: "remove", id: t.id });
-        notify("info", "Citation deleted", `#${t.citationNo} is off the record.`);
+        notify("info", "Deleted", `#${t.citationNo} removed.`);
       },
     });
 
   const handleICS = (t: Ticket) => {
     downloadICS(t);
-    notify(
-      "success",
-      "Calendar file downloaded",
-      "Open the .ics — due date and an early alarm land in any calendar app.",
-    );
+    notify("success", "Calendar file downloaded");
   };
 
   const handleSMS = (t: Ticket) => {
     if (!t.phone) {
-      notify("warn", "No number on file", "Open the case file and add a mobile number first.");
+      notify("warn", "No phone number", "Add a number in the ticket details first.");
       return;
     }
     const a = document.createElement("a");
@@ -231,11 +209,7 @@ export default function App() {
     document.body.appendChild(a);
     a.click();
     a.remove();
-    notify(
-      "info",
-      "Reminder drafted",
-      "Your messaging app should open with the text pre-written — just hit send.",
-    );
+    notify("info", "Reminder drafted", "Your messaging app should open with the text ready.");
   };
 
   const updateTicket = (
@@ -254,9 +228,9 @@ export default function App() {
     if (ok.length) {
       try {
         dispatch({ type: "addAttachments", id, attachments: ok });
-        notify("success", ok.length === 1 ? "1 file attached" : `${ok.length} files attached`, "Filed under evidence.");
+        notify("success", ok.length === 1 ? "1 file added" : `${ok.length} files added`);
       } catch {
-        notify("error", "Couldn't save", "Browser storage refused the file.");
+        notify("error", "Couldn't save", "Storage refused the file.");
       }
     }
   };
@@ -266,10 +240,8 @@ export default function App() {
     setStatus("all");
   };
 
-  /* ---------- render ---------- */
   return (
     <div className="min-h-screen">
-      <div className="bg-scene" />
       <Header onNew={() => setFormOpen(true)} />
 
       <main className="mx-auto max-w-6xl px-4 pb-10 sm:px-6">
@@ -292,47 +264,48 @@ export default function App() {
 
         {tickets.length === 0 ? (
           <Reveal>
-            <div className="mt-10 flex flex-col items-center rounded-lg border border-dashed border-edge bg-panel/50 px-6 py-16 text-center">
-              <RegSign />
-              <h2 className="mt-6 font-display text-4xl tracking-wider text-snow">
-                NO TICKETS ON FILE
+            <div className="mt-10 flex flex-col items-center rounded-2xl border-2 border-dashed border-border bg-surface px-6 py-16 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-soft">
+                <IconTicket width={32} height={32} className="text-blue" />
+              </div>
+              <h2 className="mt-6 font-display text-2xl font-bold text-text">
+                No tickets yet
               </h2>
-              <p className="mt-2 max-w-sm text-sm leading-relaxed text-fog">
-                Lucky you. The moment one shows up, log it here and CiteTrack
-                will ride shotgun on the deadline.
+              <p className="mt-2 max-w-sm text-sm text-muted">
+                When a ticket comes in, log it here and we'll track the deadline for you.
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <button
                   onClick={() => setFormOpen(true)}
-                  className="flex items-center gap-2 rounded-md bg-warn px-5 py-2.5 text-sm font-extrabold text-ink shadow-[0_3px_0_#7a5100] transition-all hover:brightness-110 active:translate-y-[2px] active:shadow-[0_1px_0_#7a5100]"
+                  className="flex items-center gap-2 rounded-lg bg-blue px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-blue2 active:translate-y-px"
                 >
-                  <IconPlus width={15} height={15} strokeWidth={2.6} /> Log a citation
+                  <IconPlus width={16} height={16} strokeWidth={2.2} /> Add first ticket
                 </button>
                 <button
                   onClick={() => {
                     dispatch({ type: "seed" });
-                    notify("info", "Sample data restored", "Four demo citations loaded.");
+                    notify("info", "Sample data loaded");
                   }}
-                  className="flex items-center gap-2 rounded-md border border-edge px-5 py-2.5 text-sm font-bold text-fog transition-all hover:border-edge2 hover:text-snow active:translate-y-px"
+                  className="flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-text2 transition-colors hover:bg-raised"
                 >
-                  <IconTicket width={15} height={15} /> Restore sample data
+                  Load sample data
                 </button>
               </div>
             </div>
           </Reveal>
         ) : visible.length === 0 ? (
           <Reveal>
-            <div className="mt-10 flex flex-col items-center rounded-lg border border-dashed border-edge bg-panel/50 px-6 py-14 text-center">
-              <IconSearch width={30} height={30} className="text-dim" />
-              <h2 className="mt-4 font-display text-2xl tracking-wider text-snow">
-                NOTHING MATCHES
+            <div className="mt-10 flex flex-col items-center rounded-2xl border-2 border-dashed border-border bg-surface px-6 py-14 text-center">
+              <IconSearch width={32} height={32} className="text-muted" />
+              <h2 className="mt-4 font-display text-xl font-bold text-text">
+                No matches
               </h2>
-              <p className="mt-2 text-sm text-fog">
-                No citations fit that search / filter combination.
+              <p className="mt-2 text-sm text-muted">
+                No tickets match that search or filter.
               </p>
               <button
                 onClick={resetFilters}
-                className="mt-5 rounded-md border border-edge px-4 py-2 text-xs font-bold text-fog transition-all hover:border-warn/60 hover:text-warn active:translate-y-px"
+                className="mt-5 rounded-lg border border-border px-4 py-2 text-sm font-medium text-text2 transition-colors hover:bg-raised"
               >
                 Clear filters
               </button>
@@ -341,19 +314,16 @@ export default function App() {
         ) : (
           <>
             <div className="mt-8 flex items-baseline gap-3">
-              <h2 className="font-display text-2xl tracking-wide text-snow">
-                CITATIONS ON FILE
+              <h2 className="font-display text-xl font-bold text-text">
+                All Tickets
               </h2>
-              <span className="rounded-sm border border-edge bg-panel px-2 py-0.5 font-mono text-xs font-bold text-fog">
+              <span className="rounded-full bg-raised px-2.5 py-0.5 text-xs font-semibold text-muted">
                 {visible.length}
               </span>
-              <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-[0.2em] text-dim sm:block">
-                click a card for the full case file
-              </span>
             </div>
-            <div className="mt-4 flex flex-col gap-3.5">
+            <div className="mt-4 flex flex-col gap-3">
               {visible.map((t, i) => (
-                <Reveal key={t.id} delay={Math.min(i, 6) * 55}>
+                <Reveal key={t.id} delay={Math.min(i, 6) * 50}>
                   <TicketCard
                     ticket={t}
                     onOpen={() => setDetailId(t.id)}
@@ -363,7 +333,7 @@ export default function App() {
                       updateTicket(
                         t.id,
                         { status: "paid", resolvedAt: Date.now() },
-                        ["success", "Marked as paid", `#${t.citationNo} cleared — nice driving… paperwork.`],
+                        ["success", "Marked as paid"],
                       )
                     }
                     onDelete={() => requestDelete(t)}
@@ -374,25 +344,22 @@ export default function App() {
           </>
         )}
 
-        {/* footer */}
-        <footer className="mt-16 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-edge pt-6">
-          <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.14em] text-dim">
-            CiteTrack v1.0 — data lives only in this browser.
-            <br className="hidden sm:block" />
-            .ics opens in any calendar · texts hand off to your messaging app.
+        <footer className="mt-16 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-border pt-6">
+          <p className="text-xs text-muted">
+            Ascent Logistics Ticket Tracker · Data stored in this browser only
           </p>
           <div className="ml-auto flex items-center gap-4">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-dim">
-              {tickets.length} citation{tickets.length === 1 ? "" : "s"} on file
+            <span className="text-xs text-muted">
+              {tickets.length} ticket{tickets.length === 1 ? "" : "s"}
             </span>
             {tickets.length > 0 && (
               <button
                 onClick={() =>
                   setConfirm({
-                    title: "Clear the whole record?",
+                    title: "Clear all data?",
                     message:
-                      "Every citation, note and attachment stored in this browser will be permanently erased.",
-                    confirmLabel: "Erase everything",
+                      "Every ticket, note, and attachment will be permanently erased.",
+                    confirmLabel: "Clear all",
                     danger: true,
                     onConfirm: () => {
                       dispatch({ type: "clear" });
@@ -401,13 +368,13 @@ export default function App() {
                       } catch {
                         /* noop */
                       }
-                      notify("info", "Record erased", "Fresh start. Drive carefully.");
+                      notify("info", "All data cleared");
                     },
                   })
                 }
-                className="rounded-md border border-danger/40 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-danger transition-all hover:bg-danger/10 active:translate-y-px"
+                className="rounded-lg border border-red-border px-3 py-1.5 text-xs font-medium text-red transition-colors hover:bg-red-soft"
               >
-                Clear all data
+                Clear all
               </button>
             )}
           </div>
@@ -420,13 +387,13 @@ export default function App() {
         onUpdate={updateTicket}
         onAddNote={(id, text) => {
           dispatch({ type: "addNote", id, text });
-          notify("success", "Note filed");
+          notify("success", "Note added");
         }}
         onDeleteNote={(id, noteId) => dispatch({ type: "deleteNote", id, noteId })}
         onAddFiles={addFiles}
         onRemoveAttachment={(id, attId) => {
           dispatch({ type: "removeAttachment", id, attachmentId: attId });
-          notify("info", "Evidence removed");
+          notify("info", "Removed");
         }}
         onRequestDelete={requestDelete}
         notify={notify}

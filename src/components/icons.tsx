@@ -61,13 +61,6 @@ export const IconClip = (p: P) => (
   </svg>
 );
 
-export const IconCamera = (p: P) => (
-  <svg {...base(p)}>
-    <path d="M4 8h3l1.5-2.5h7L17 8h3v11H4z" />
-    <circle cx="12" cy="13" r="3.4" />
-  </svg>
-);
-
 export const IconTrash = (p: P) => (
   <svg {...base(p)}>
     <path d="M4.5 6.5h15M9.5 6V4.5h5V6M6.5 6.5l1 13h9l1-13M10 10.5v5.5M14 10.5v5.5" />
@@ -84,12 +77,6 @@ export const IconCopy = (p: P) => (
   <svg {...base(p)}>
     <rect x="8.5" y="8.5" width="12" height="12" rx="2" />
     <path d="M15.5 5.5v-1a2 2 0 0 0-2-2h-9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h1" transform="translate(1,1)" />
-  </svg>
-);
-
-export const IconGavel = (p: P) => (
-  <svg {...base(p)}>
-    <path d="M13.2 4.2l6.6 6.6M11 6.4l6.6 6.6M12.1 5.3l-7.9 7.9 2.5 2.5 7.9-7.9M4 20.5h9.5" />
   </svg>
 );
 
@@ -147,26 +134,8 @@ export const IconEye = (p: P) => (
   </svg>
 );
 
-/** US route-shield style logo mark */
-export const ShieldMark = ({ className = "" }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-    <path
-      d="M12 1.2c2.8 0 5.7 1.8 8.6 1.3.7 5.8-.9 12-8.6 20.3C4.3 14.5 2.7 8.3 3.4 2.5 6.3 3 9.2 1.2 12 1.2z"
-      fill="var(--color-snow)"
-    />
-    <path
-      d="M12 2.6c2.4 0 4.9 1.5 7.3 1.2.6 5-.9 10.3-7.3 17.4C5.6 14.1 4.1 8.8 4.7 3.8 7.1 4.1 9.6 2.6 12 2.6z"
-      fill="var(--color-signgreen)"
-    />
-    <text
-      x="12"
-      y="13.4"
-      textAnchor="middle"
-      fontFamily="Anton, sans-serif"
-      fontSize="7.5"
-      fill="var(--color-snow)"
-    >
-      CT
-    </text>
+export const IconUpload = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M12 15.5V3.5M7.5 8L12 3.5l4.5 4.5M4.5 15.5v4h15v-4" />
   </svg>
 );
